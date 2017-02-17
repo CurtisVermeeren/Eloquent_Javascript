@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Autocompletion</title>
+		<script src="promise.js"></script>
+	</head>
+	<body>
+		<input type="text" id="field">
+		<div id="suggestions" style="cursor: pointer"></div>
+		<script type="text/javascript">
+		// Builds up an array with global variable names, like
+		// 'alert', 'document', and 'scrollTo'
+		var terms = [];
+		for (var name in window)
+		  terms.push(name);
+
+		// Get text area and place for suggestions
+		var textfield = document.querySelector("#field");
+		var suggestions = document.querySelector("#suggestions");
+
+		// Listen for input on the textfield
+		textfield.addEventListener("input", function(){
+			// Get matching values of the input from the terms array
+			var matching = terms.filter(function(term){
+				return term.indexOf(textfield.value) == 0;
+			});
+			// Cleat the suggestions
+			suggestions.textContent = "";
+			// For the first 20 matches
+			matching.slice(0,20).forEach(function(term){
+				// Create a node element and set it's text to the match
+				var node = document.createElement("div");
+				node.textContent = term;
+				// Listen for a click on the term and if clicked set the textfield to the term
+				node.addEventListener("click", function(){
+					textfield.value = term;
+					suggestions.textContent = "";
+				});
+				// Add the term to the suggestion box with it's listener
+				suggestions.appendChild(node);
+			});
+		})
+
+		</script>
+	</body>
+</html>

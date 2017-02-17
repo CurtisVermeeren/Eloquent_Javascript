@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Every and then Some</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	function every(array, check){
+		for (var x = 0; x < array.length; x++){
+			//If one is false then return false
+			if (!check(array[i]))
+				return false;
+		}
+		//Only true if all pass test
+		return true;
+	}
+
+	function some(array, check){
+		function every(array, check){
+			for (var x = 0; x < array.length; x++){
+				//If one is true then some are true
+				if (check(array[i]))
+					return true;
+			}
+			//Only false if none are true
+			return true;
+		}
+	}
+	</script>
+	</body>
+</html>

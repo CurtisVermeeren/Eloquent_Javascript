@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Elements by tag name</title>
+		<script src="mountains.js"></script>
+		<script src="13_dom.js"></script>
+	</head>
+	<body>
+		<h1>Heading with a <span>span</span> element.</h1>
+		<p>A paragraph with <span>one</span>, <span>two</span> spans.</p>
+
+	<script type="text/javascript">
+
+		// Find all descendants of node with tagName
+		function byTagName(node, tagName){
+			var found = [];
+			// The nodeName property returns in all caps so we must match
+			tagName = tagName.toUpperCase();
+
+			function explore(node){
+				// Get each child of node
+				for (var x = 0; x < node.childNodes.length; x++){
+					var child = node.childNodes[x];
+					// If it is an element node child
+					if (child.nodeType == document.ELEMENT_NODE){
+						// Check the tag of the element for a match
+						if (child.nodeName == tagName)
+							// If matching add the child to found
+							found.push(child);
+						// Recursively call explore with the children nodes
+						explore(child);
+					}
+				}
+			}
+			// Call explore on the given node and return all found
+			explore(node);
+			return found;
+		}
+
+
+		console.log(byTagName(document.body, "h1").length);
+		console.log(byTagName(document.body, "span").length);
+
+		var para = document.querySelector("p");
+  		console.log(byTagName(para, "span").length);
+	</script>
+	</body>
+</html>

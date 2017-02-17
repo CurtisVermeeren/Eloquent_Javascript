@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Another Cell</title>
+		<script src ="06_object.js"></script>
+	</head>
+	<body>
+	<script type="text/javascript">
+	// Param: inner is the cell within the stretchcell
+	function StretchCell(inner, width, height){
+		this.inner = inner;
+		this.width = width;
+		this.height = height;
+	}
+
+	// The min width is the size of the cell or the largest cell inside it
+	StretchCell.prototype.minWidth = function(){
+		return Math.max(this.width, this.inner.minWidth());
+	}
+
+	// The min height is the size of the cell or the largest cell inside it
+	StretchCell.prototype.minHeight = function(){
+		return Math.max(this.height, this.inner.minHeight());
+	}
+
+
+	StretchCell.prototype.draw = function(width, height){
+		return this.inner.draw(width, height);
+	}
+
+	var strech = new StretchCell(new TextCell("abc"), 1, 2);
+
+	console.log(strech.minWidth());
+	console.log(strech.minHeight());
+	console.log(strech.draw(3, 2));
+	</script>
+	</body>
+</html>

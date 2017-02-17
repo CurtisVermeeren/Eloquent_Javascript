@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Content Negotiation</title>
+	</head>
+	<body>
+		<script type="text/javascript">
+			function requestAuthor(type){
+				// Create a new request
+				var req = new XMLHttpRequest();
+				req.open("GET", "http://eloquentjavascript.net/author", false);
+				// Use to Accept header to request a specific type of document
+				req.setRequestHeader("accept", type);
+				// Send the request
+				req.send(null);
+				// Return the response
+				return req.responseText;
+			}
+
+			// The types to be requested
+			var types = ["text/plain",
+             			 "text/html",
+             			 "application/json",
+             			 "application/rainbows+unicorns"];
+
+			// Make a request for each type
+			types.forEach(function(type){
+				try {
+					console.log(type + ":\n", requestAuthor(type), "\n");
+				} catch (e){
+					console.log("Error: "+ e);
+				}
+			})
+		</script>
+	</body>
+</html>

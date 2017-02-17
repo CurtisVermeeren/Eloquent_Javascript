@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Electronic Life Project</title>
+		<script src = "animateworld.js"></script>
+
+	</head>
+	<body>
+	<script type="text/javascript">
+	// Define the world using a plan. One character per square
+	// "#" represents walls and rocks, "o" represents critters
+ 	var plan = ["############################",
+            	"#      #    #      o      ##",
+           	 	"#                          #",
+            	"#          #####           #",
+            	"##         #   #    ##     #",
+            	"###           ##     #     #",
+            	"#           ###      #     #",
+            	"#   ####                   #",
+            	"#   ##       o             #",
+            	"# o  #         o       ### #",
+            	"#    #                     #",
+            	"############################"];
+
+	// We need a vector to define squares in the world
+	function Vector(x, y){
+		this.x = x;
+		this.y = y;
+	}
+
+	// Function adds two vectors together
+	Vector.prototype.plus = function(vector2){
+		return new Vector(this.x + vector2.x, this.y + vector2.y);
+	};
+
+	// We need a grid to store values in separate from the world
+	function Grid(width,height){
+		this.space = new Array(width * height);
+		this.width = width;
+		this.height = height;
+	}
+
+	// Check if vector is inside the grid
+	Grid.prototype.isInside = function (vector) {
+		return vector.x >= 0 && vector.x < this.width &&
+			   vector.y >= 0 && vector.y < this.height;
+	};
+
+	// Get an element in the grid
+	Grid.prototype.get = function (vector) {
+		return this.space[vector.x + this.width * vector.y];
+	};
+
+	// Set an element in the grid
+	Grid.prototype.set = function (vector, value) {
+		this.space[vector.x + this.width * vector.y] = value;
+	};
+
+	// All directions around a critter
+	var directions = {
+  		"n":  new Vector( 0, -1),
+  		"ne": new Vector( 1, -1),
+  		"e":  new Vector( 1,  0),
+		"se": new Vector( 1,  1),
+  		"s":  new Vector( 0,  1),
+  		"sw": new Vector(-1,  1),
+  		"w":  new Vector(-1,  0),
+  		"nw": new Vector(-1, -1)
+	};
+
+	// Split directions into an array where each element is a directions
+	var directionNames = "n ne e se s sw w nw".split(" ");
+
+	// Get a random element from an Array
+	function randomElement(array){
+		return array[Math.floor(Math.random() * array.length)];
+	}
+
+	// Bouncing creature gets it's direction at random
+	function BouncingCritter(){
+		this.direction = randomElement(directionNames);
+	}
+
+	// Make a critter act on a view
+	BouncingCritter.prototype.act = function(view) {
+		// If the direction isn't open
+		if (view.look(this.direction) != " ")
+			// Check if there is a free space
+			// Set as s if stuck rather than null
+			this. direction = view.find(" ") || "s";
+		// Retrun action with type move and it's direction
+		return {type: "move", direction: this.direction};
+	};
+
+	// Function to read an element given a character and a legend
+	function elementFromChar(legend, ch){
+		// Check if a blank space
+		if (ch == " ") return null;
+		// Create an element using the legend
+		var element = new legend[ch]();
+		// Need this property later to print the world
+		element.originChar = ch;
+		return element;
+	}
+
+	// Function to get a character given an element
+	function charFromElement(element){
+		if (element == null) return " ";
+		else return element.originChar;
+	}
+
+	// Create a grid world using a legend and a map
+	function World(map, legend){
+		// Grid the size of the map
+		var grid  = new Grid(map[0].length, map.length)
+		this.grid = grid;
+		this.legend = legend;
+
+		// Convert the map to grid elements
+		map.forEach(function(line, y){
+			for (var x = 0; x < line.length; x++)
+				grid.set(new Vector(x, y), elementFromChar(legend, line[x]));
+		});
+	}
+
+	// Function to print a world as a character map
+	World.prototype.toString = function () {
+		var output = "";
+		for (var y = 0; y < this.grid.height; y++){
+			for (var x = 0; x < this.grid.width; x++){
+				var element = this.grid.get(new Vector(x, y));
+				output += charFromElement(element);
+			}
+			output += "\n";
+		}
+		return output;
+	}
+
+	// Wall is only used to take up space it does nothing on act
+	function Wall() {}
+
+	// Create a new world using the plan and creating a legend
+	var world = new World(plan, {"#": Wall,
+                             	 "o": BouncingCritter});
+
+ 	Grid.prototype.forEach = function(f, context){
+		for (var y = 0; y < this.height; y++){
+			for (var x = 0; x < this.width; x++){
+				var value = this.space[x + y * this.width];
+				if (value != null)
+					f.call(context, value, new Vector(x, y));
+			}
+		}
+	};
+
+	// Function to give each critter a chance to act
+	World.prototype.turn = function(){
+		var acted = [];
+		this.grid.forEach(function(critter, vector){
+			if(critter.act && acted.indexOf(critter) == -1){
+				acted.push(critter);
+				this.letAct(critter,vector);
+			}
+		}, this);
+	};
+
+	// Function for the critter to act
+	World.prototype.letAct = function(critter, vector){
+		// Ask critter to act giving it a view of the world around it
+		var action = critter.act(new View(this, vector));
+		// If the action is move check the direction and if it is valid
+		if (action && action.type == "move"){
+			var dest = this.checkDestination(action, vector);
+			if (dest && this.grid.get(dest) == null){
+				// Set the previous location null and the destination as the critter
+				this.grid.set(vector, null);
+				this.grid.set(dest, critter);
+			}
+		}
+	};
+
+	// Check if the destination is valid
+	World.prototype.checkDestination = function(action, vector) {
+		if (directions.hasOwnProperty(action.direction)){
+			var dest = vector.plus(directions[action.direction]);
+			if (this.grid.isInside(dest)) return dest;
+		}
+	};
+
+	// View object of a vector
+	function View(world, vector){
+		this.world = world;
+		this.vector = vector;
+	}
+
+	// Look in a direction from the current view
+	View.prototype.look = function(dir) {
+		// The target is the current location added to the direction
+		var target = this.vector.plus(directions[dir]);
+		//Ensure it is valid
+		if (this.world.grid.isInside(target))
+			// Return the character at the target
+			return charFromElement(this.world.grid.get(target));
+		else {
+			return "#";
+		}
+	};
+
+	// Find all elements of ch around the view
+	View.prototype.findAll = function(ch) {
+		var found = [];
+		for (var dir in directions)
+			if (this.look(dir) == ch)
+				found.push(dir);
+		return found;
+	};
+
+	// Find an element of ch around view
+	View.prototype.find = function(ch) {
+		var found = this.findAll(ch);
+		if (found.length == 0) return null;
+			return randomElement(found);
+	};
+
+	// Get a direction 45 degress turn from the input direction
+	function dirPlus ( dir , n ) {
+		var index = directionNames . indexOf ( dir ) ;
+		return directionNames [( index + n + 8) % 8];
+	}
+
+	// Wall flower object moves along walls
+	function WallFollower () {
+		this . dir = " s ";
+	}
+
+	// When it moves we will need to check that it doesn't move to open space all around it
+	WallFollower.prototype.act = function(view) {
+  		var start = this.dir;
+		// Make sure the direion isn't an open space
+  		if (view.look(dirPlus(this.dir, -3)) != " ")
+    		start = this.dir = dirPlus(this.dir, -2);
+  		while (view.look(this.dir) != " ") {
+    		this.dir = dirPlus(this.dir, 1);
+		    if (this.dir == start) break;
+  		}
+  		return {type: "move", direction: this.dir};
+	};
+
+	// A life like world Object with new act methods
+	function LifelikeWorld(map, legend) {
+  		World.call(this, map, legend);
+	}
+
+	LifelikeWorld.prototype = Object.create(World.prototype);
+	var actionTypes = Object.create(null);
+
+	// New letAct accounts for a critters energy and checks for different actions
+	LifelikeWorld.prototype.letAct = function(critter, vector) {
+  		var action = critter.act(new View(this, vector));
+  		var handled = action && action.type in actionTypes && actionTypes[action.type].call(this, critter, vector, action);
+		//Check and update the critters energy. If low then don't move
+		if (!handled) {
+    		critter.energy -= 0.2;
+    		if (critter.energy <= 0)
+      			this.grid.set(vector, null);
+  		}
+	};
+
+	// Function for a grow action to increase a critters energy
+	actionTypes.grow = function(critter) {
+  		critter.energy += 0.5;
+  		return true;
+	};
+
+	// Function for a move action to move a critter in the LifelikeWorld
+	actionTypes.move = function(critter, vector, action) {
+  		var dest = this.checkDestination(action, vector);
+  		if (dest == null || critter.energy <= 1 || this.grid.get(dest) != null)
+    		return false;
+  		critter.energy -= 1;
+  		this.grid.set(vector, null);
+  		this.grid.set(dest, critter);
+		return true;
+	};
+
+	// Function for an eat action
+	actionTypes.eat = function(critter, vector, action) {
+  		var dest = this.checkDestination(action, vector);
+  		var atDest = dest != null && this.grid.get(dest);
+  		if (!atDest || atDest.energy == null)
+    		return false;
+  		critter.energy += atDest.energy;
+  		this.grid.set(dest, null);
+  		return true;
+	};
+
+
+	// Function for a reproduce action
+	actionTypes.reproduce = function(critter, vector, action) {
+  		var baby = elementFromChar(this.legend,critter.originChar);
+  		var dest = this.checkDestination(action, vector);
+  		if (dest == null || critter.energy <= 2 * baby.energy || this.grid.get(dest) != null)
+    		return false;
+  		critter.energy -= 2 * baby.energy;
+  		this.grid.set(dest, baby);
+  		return true;
+	};
+
+	// Plant object that can give a random energy amount
+	function Plant(){
+		this.energy = 3 + Math.random() * 4;
+	}
+
+	// Function for a plany action
+	Plant.prototype.act = function(view) {
+		// If the plant has enough energy reproduce
+		if (this.energy > 15){
+			// Reproduce if space beside
+			var space = view.find(" ");
+			if (space)
+				return {type: "reproduce", direction: space};
+		}
+		// If not enough energy grow the plant
+		if (this.energy < 20)
+			return {type: "grow"};
+	}
+
+	//Define an Object that eats plants
+	function PlantEater () {
+		this . energy = 20;
+	}
+
+	PlantEater.prototype.act = function(view) {
+		var space = view.find(" ");
+		if ( this.energy > 60 && space )
+			return {type: "reproduce" , direction: space};
+		var plant = view.find("*");
+		if (plant)
+			return {type:"eat" , direction:plant };
+		if (space)
+			return {type :"move" ,direction: space };
+	};
+
+	function SmartPlantEater() {
+  		this.energy = 30;
+  		this.direction = "e";
+	}
+
+	SmartPlantEater.prototype.act = function(view) {
+  		var space = view.find(" ");
+		// Need higher energy to reproduce
+  		if (this.energy > 90 && space)
+    		return {type: "reproduce", direction: space};
+  		var plants = view.findAll("*");
+  		if (plants.length > 1)
+    		return {type: "eat", direction: randomElement(plants)};
+  		if (view.look(this.direction) != " " && space)
+    		this.direction = space;
+  		return {type: "move", direction: this.direction};
+	};
+
+	function Tiger() {
+	  this.energy = 100;
+	  this.direction = "w";
+	  // Used to track the amount of prey seen per turn in the last six turns
+	  this.preySeen = [];
+	}
+
+	Tiger.prototype.act = function(view) {
+	  // Average number of prey seen per turn
+	  var seenPerTurn = this.preySeen.reduce(function(a, b) {
+	    return a + b;
+	  }, 0) / this.preySeen.length;
+	  var prey = view.findAll("O");
+	  this.preySeen.push(prey.length);
+	  // Drop the first element from the array when it is longer than 6
+	  if (this.preySeen.length > 6)
+	    this.preySeen.shift();
+
+	  // Only eat if the predator saw more than ¼ prey animal per turn
+	  if (prey.length && seenPerTurn > 0.25)
+	    return {type: "eat", direction: randomElement(prey)};
+
+	  var space = view.find(" ");
+	  if (this.energy > 400 && space)
+	    return {type: "reproduce", direction: space};
+	  if (view.look(this.direction) != " " && space)
+	    this.direction = space;
+	  return {type: "move", direction: this.direction};
+	};
+
+	animateWorld(new LifelikeWorld(
+	  ["####################################################",
+	   "#                 ####         ****              ###",
+	   "#   *  @  ##                 ########       OO    ##",
+	   "#   *    ##        O O                 ****       *#",
+	   "#       ##*                        ##########     *#",
+	   "#      ##***  *         ****                     **#",
+	   "#* **  #  *  ***      #########                  **#",
+	   "#* **  #      *               #   *              **#",
+	   "#     ##              #   O   #  ***          ######",
+	   "#*            @       #       #   *        O  #    #",
+	   "#*                    #  ######                 ** #",
+	   "###          ****          ***                  ** #",
+	   "#       O                        @         O       #",
+	   "#   *     ##  ##  ##  ##               ###      *  #",
+	   "#   **         #              *       #####  O     #",
+	   "##  **  O   O  #  #    ***  ***        ###      ** #",
+	   "###               #   *****                    ****#",
+	   "####################################################"],
+	  {"#": Wall,
+	   "@": Tiger,
+	   "O": SmartPlantEater, // from previous exercise
+	   "*": Plant}
+	));
+	</script>
+	</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Javascript Workbench</title>
+	</head>
+	<body>
+	<textarea id="code">return "hi";</textarea>
+	<button id="button">Run</button>
+	<pre id="output"></pre>
+	<script type="text/javascript">
+		// Add a listener on the button
+		document.querySelector("#button").addEventListener("click",function(){
+			// Get code from input area
+			var code = document.querySelector("#code").value;
+			// Set the output area
+			var outputNode = document.querySelector("#output");
+			try {
+				// Attempt to run the code and set output
+				var result = new Function(code)();
+				outputNode.innerText = String(result);
+			} catch(e) {
+				// Catch any errors 
+				outputNode.innerText = "Error: " + e;
+			}
+		});
+	</script>
+	</body>
+</html>

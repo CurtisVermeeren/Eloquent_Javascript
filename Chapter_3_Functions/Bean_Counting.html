@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bean Counting</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+		function countBs(string){
+			var count = 0;
+			for (var x  = 0; x < string.length; x++){
+				if (string.charAt(x) == 'B') count++;
+			}
+			return count;
+		}
+
+		function countChar(string, char){
+			var count = 0;
+			for (var x  = 0; x < string.length; x++){
+				if (string.charAt(x) == char) count++;
+			}
+			return count
+		}
+
+		console.log(countBs('BBC'));
+		console.log(countChar("kakkerlak", "k"));
+	</script>
+	</body>
+</html>

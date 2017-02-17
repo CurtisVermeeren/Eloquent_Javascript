@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Parent Child Age Difference</title>
+		<script src="code/ancestry.js"></script>
+	</head>
+	<body>
+	<script type="text/javascript">
+	// load dependencies in head and parse JSON 
+	var ancestry = JSON.parse(ANCESTRY_FILE);
+
+	//Get the average of an array
+	//This will be an array were each index holds a value of an age difference
+	function average(array){
+		function plus(a,b) {return a + b}
+		return array.reduce(plus) / array.length;
+	}
+
+	//Add all people using their name as a key
+	var byName = {};
+	ancestry.forEach(function(person){
+		byName[person.name] = person;
+	});
+
+	var differences = ancestry.filter(function(person){
+		//Filter out people without a mother in the list
+		return byName[person.mother] != null;
+	}).map(function(person) {
+		//Calculate the difference between the persons age an their mother
+		return person.born - byName[person.mother].born;
+	});
+
+	//Find the average of the difference in age array and print results
+	console.log(average(differences));
+	</script>
+	</body>
+</html>

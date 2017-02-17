@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Tabs</title>
+	</head>
+	<body>
+		<div id="wrapper">
+		  <div data-tabname="one">Tab one</div>
+		  <div data-tabname="two">Tab two</div>
+		  <div data-tabname="three">Tab three</div>
+		</div>
+	<script type="text/javascript">
+		function asTabs(node){
+			// Hold the tabs
+			var tabs = [];
+
+			// If the child of nodes is an element at it to the tabs array
+			for (var x = 0; x < node.childNodes.length; x++){
+				var child = node.childNodes[x];
+				if (child.nodeType == document.ELEMENT_NODE) tabs.push(child);
+			}
+
+			// Create a div for the tab list
+			var tabList = document.createElement("div");
+			// Create a button for each tab in the tab list
+			tabs.forEach((tab, i) => {
+				var button = document.createElement("button");
+				button.textContent = tab.getAttribute("data-tabname");
+				// Listen for clicks on the button
+				button.addEventListener("click", function() { selectTab(i); });
+				tabList.appendChild(button);
+			});
+
+			node.insertBefore(tabList, node.firstChild);
+
+			function selectTab(n){
+				tabs.forEach((tab,i) => {
+					// If this is the selected tab show it
+					if (i == n)
+						tab.style.display = "";
+					else
+						// If not selected don't show
+						tab.style.display = "none";
+				});
+
+				// If the button was selected give it a violet background 
+				for (var x = 0; x < tabList.childNodes.length; x++){
+					if (x == n)
+			          tabList.childNodes[x].style.background = "violet";
+			        else
+			          tabList.childNodes[x].style.background = "";
+				}
+			}
+		}
+
+		// Run asTabs on the wrapper div node
+		asTabs(document.querySelector("#wrapper"));
+	</script>
+	</body>
+</html>

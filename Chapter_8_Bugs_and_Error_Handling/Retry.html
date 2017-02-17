@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Retry</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	//Exception type
+	function MultiplicatorUnitFailure() {}
+
+	// The Basic multiple function only runs 50% of the time
+	function primitiveMultiple(a, b){
+		// 50% of time it will multiple the numbers
+		if(Math.random() < 0.5) return a * b;
+		else
+			// Throw the exception otherwise
+			throw new MultiplicatorUnitFailure();
+	}
+
+	// Runs until all call succeds
+	function reliableMultiply(a, b){
+		for(;;){
+			try {
+				// Attempt the multiplication
+				return primitiveMultiple(a, b);
+			} catch (e){
+				// Log to show how it works
+				console.log(e);
+				// If not a MultiplicatorUnitFailure then throw the exception
+				if (!(e instanceof MultiplicatorUnitFailure))
+					throw e;
+			}
+		}
+	}
+
+	console.log(reliableMultiply(8, 8));
+	</script>
+	</body>
+</html>

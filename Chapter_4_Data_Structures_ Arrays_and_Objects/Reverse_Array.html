@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Reverse An Array</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	function reverseArray(array){
+		var newArray = [];
+		for (var x = 0; x < array.length; x++){
+			newArray[array.length- 1 - x] = array[x];
+		}
+		return newArray;
+	}
+
+	function reverseArrayInPlace(array){
+		for (var x = 0; x < Math.floor(array.length / 2); x++){
+			var old = array[x];
+			array[x] = array[array.length - 1 - x];
+			array[array.length - 1 -i] = old;
+		}
+		return array;
+	}
+
+	console.log(reverseArray([1,2,3,4,5]));
+
+	</script>
+	</body>
+</html>

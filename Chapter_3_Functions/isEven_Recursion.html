@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>IsEven? Recursion</title>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			function isEven(x){
+				// Zero is even
+				if (x == 0){
+					return true;
+				// One is odd
+				} else if (x == 1){
+					return false;
+				// If negative rerun with positive
+				} else if (x < 0){
+					return isEven(-x);
+				// Rereun subtracting 2. When know that for any number N the eveness is the same for N - 2
+				} else {
+					return isEven(x - 2);
+				}
+			}
+
+
+			console.log(isEven(23));
+			console.log(isEven(-1));
+			console.log(isEven(75));
+		</script>
+	</body>
+</html>

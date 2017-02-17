@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bouncing Ball Animation</title>
+	</head>
+	<body>
+		<canvas width="400" height="400"></canvas>
+		<script type="text/javascript">
+			var cx = document.querySelector("canvas").getContext("2d");
+
+			var lastTime = null;
+			function frame(time) {
+			if (lastTime != null)
+			updateAnimation(Math.min(100, time - lastTime) / 1000);
+			lastTime = time;
+			requestAnimationFrame(frame);
+			}
+			requestAnimationFrame(frame);
+
+			// Ball starting position x and y
+			var x = 100, y = 300;
+			// Define radius of the ball
+			var radius = 10;
+			// Starting direction speeds of the ball
+			var speedX = 100, speedY = 60;
+
+			function updateAnimation(step) {
+				// Your code here.
+
+				// Clear the canvas
+				cx.clearRect(0, 0, 400, 400);
+
+				// Create a blue box
+				cx.strokeStyle = "blue";
+				cx.lineWidth = 4;
+				cx.strokeRect(25, 25, 350, 350);
+
+				// Move the ball around by adjusting the x and y using speed values
+				x += step * speedX;
+				y += step * speedY;
+				// Make sure the ball doesn't leave the defined blue box
+				// If leaving then bounce the ball with negative movement
+				if (x < 25 + radius || x > 375 - radius)
+				  speedX = -speedX;
+				if (y < 25 + radius || y > 375 - radius)
+				  speedY = -speedY;
+				// Set ball colour to red
+				cx.fillStyle = "red";
+				cx.beginPath();
+				// Draw a circle using arc
+				// Use x and y for positon of the circle
+				// Set the radius,
+				// Staring angle 0 and ending angle 12 to draw a complete cirlce
+				cx.arc(x, y, radius, 0, 12);
+				// Fill the ball with red 
+				cx.fill();
+			}
+		</script>
+	</body>
+</html>

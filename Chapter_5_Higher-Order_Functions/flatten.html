@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Flatten Array</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+		//Define and arrar of arrarys to flatten
+		var arrays = [[1,2,3],[4,5],[6,7,8,9]];
+
+		var flattened = arrays.reduce(function(flat, current){
+			return flat.concat(current)
+		});
+
+		console.log(flattened);
+	</script>
+	</body>
+</html>

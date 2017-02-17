@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Conway's Game of Life</title>
+		<script src="promise.js"></script>
+	</head>
+	<body>
+		<div id="grid"></div>
+		<button id="next">Next generation</button>
+		<button id="run">Auto run</button>
+		<script type="text/javascript">
+		// Height and width of the grid
+		var width = 30, height = 15;
+
+		// Represent the grid as an array of booleans
+
+		var gridNode = document.querySelector("#grid");
+		// This holds the checkboxes that display the grid in the document.
+		var checkboxes = [];
+		// Build a grid of size height * width
+		for (var y = 0; y < height; y++) {
+		  for (var x = 0; x < width; x++) {
+			var box = document.createElement("input");
+			box.type = "checkbox";
+			gridNode.appendChild(box);
+			checkboxes.push(box);
+		  }
+		  gridNode.appendChild(document.createElement("br"));
+		}
+
+		// Function to get the grid from checkboxes
+		function gridFromCheckboxes() {
+		  return checkboxes.map(function(box) { return box.checked; });
+		}
+		// Function to get the checkboxes from a grid
+		function checkboxesFromGrid(grid) {
+		  return grid.forEach(function(value, i) { checkboxes[i].checked = value; });
+		}
+
+		// Creatre a random grid to start
+		function randomGrid() {
+		  var result = [];
+		  for (var i = 0; i < width * height; i++)
+		    // Push true or false depending on the outcome of random
+			result.push(Math.random() < 0.3);
+		  return result;
+		}
+
+		// Create the staring checkboxes from the randmon grid
+		checkboxesFromGrid(randomGrid());
+
+		// This does a two-dimensional loop over the square around the given
+		// x,y position, counting all fields that have a cell but are not the center field.
+		function countNeighbors(grid, x, y) {
+		  var count = 0;
+		  for (var y1 = Math.max(0, y - 1); y1 <= Math.min(height - 1, y + 1); y1++) {
+			for (var x1 = Math.max(0, x - 1); x1 <= Math.min(width - 1, x + 1); x1++) {
+			  if ((x1 != x || y1 != y) && grid[x1 + y1 * width])
+				count += 1;
+			}
+		  }
+		  // Return the number of neightbors
+		  return count;
+		}
+
+		// Create the next generation grid
+		function nextGeneration(grid) {
+		  // Has width * height dimensions
+		  var newGrid = new Array(width * height);
+		  for (var y = 0; y < height; y++) {
+			for (var x = 0; x < width; x++) {
+			  // Get the neighbors for each cell
+			  var neighbors = countNeighbors(grid, x, y);
+			  var offset = x + y * width;
+			  // If less then 2 or more than 3 neighbors it dies (becomes false)
+			  if (neighbors < 2 || neighbors > 3)
+				newGrid[offset] = false;
+			  // Otherwise it is alive and true or the previous result
+			  else if (neighbors == 2)
+				newGrid[offset] = grid[offset];
+			  else
+				newGrid[offset] = true;
+			}
+		  }
+		  return newGrid;
+		}
+
+		// In a turn we create the grid from checkboxes, move to the next generation then set checkboxes based on new grid
+		function turn() {
+		  checkboxesFromGrid(nextGeneration(gridFromCheckboxes()));
+		}
+
+		// Listen from the next button to take a turn
+		document.querySelector("#next").addEventListener("click", turn);
+
+		// Auto run button to take turns at a set interval 
+		var running = null;
+		document.querySelector("#run").addEventListener("click", function() {
+		  if (running) {
+			clearInterval(running);
+			running = null;
+		  } else {
+			running = setInterval(turn, 400);
+		  }
+		});
+		</script>
+	</body>
+</html>

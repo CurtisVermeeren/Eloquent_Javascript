@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Censored Keyboard</title>
+	</head>
+	<body>
+		<input type="text">
+	<script>
+	  var field = document.querySelector("input");
+
+	  function censor(e){
+		  // Use toUpperCase to prevent both lower and uppercase
+		  var key = e.key.toUpperCase();
+		  if (key == "Q" || key == "W" || key == "X")
+		  	// If there is a match prevent typing
+		  	e.preventDefault();
+	  }
+
+	  // Add a listener on the field that runs the censor function on keydown
+	  field.addEventListener("keydown", censor);
+	</script>
+	</body>
+</html>

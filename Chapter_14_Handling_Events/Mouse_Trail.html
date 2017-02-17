@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Mouse Trail</title>
+		<style>
+		  .trail { /* className for the trail elements */
+		    position: absolute;
+		    height: 6px; width: 6px;
+		    border-radius: 3px;
+		    background: teal;
+		  }
+		  body {
+		    height: 300px;
+		  }
+		</style>
+	</head>
+	<body>
+	<script type="text/javascript">
+	// Hold trail elements
+	var trail = [];
+
+	// Create 12 dot elements
+	for (var x = 0; x < 12; x++){
+		// Create a new div
+		var node = document.createElement("div")
+		// Add the trail class to the node to style it
+		node.className = "trail";
+		// Add the node to the document
+		document.body.appendChild(node);
+		// Add it to the trail to be used later
+		trail.push(node);
+	}
+
+	// Used to track the current trail element being used of the 12
+	var current = 0;
+
+	function trails(e){
+		// Get the current trail element
+		var trailEl = trail[current];
+		// Update it's postion to the x and y of the event
+		trailEl.style.left = (e.pageX - 3) + "px";
+		trailEl.style.top = (e.pageY - 3) + "px";
+		// Move to the next current in trail array
+		current = (current + 1) % trail.length;
+	}
+
+	addEventListener("mousemove",trails);
+
+	</script>
+	</body>
+</html>

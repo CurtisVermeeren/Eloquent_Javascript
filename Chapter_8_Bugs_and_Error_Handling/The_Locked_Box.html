@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>The Locked Box</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	var box = {
+		locked : true ,
+		unlock : function () { this . locked = false ; } ,
+		lock : function () { this . locked = true ; } ,
+		_content : [] ,
+		get content () {
+			if ( this . locked ) throw new Error (" Locked !") ;
+			return this . _content ;
+		}
+	};
+
+	function withBoxUnlocked(body){
+		// Check the locked status of the box
+		var locked = box.locked;
+		// If the box is unlocked run the function passed
+		if (!locked)
+			return body();
+		// If the box was locked then unlock it
+		box.unlock();
+		// Now we can try to run our function then relock the box
+		try {
+			return body();
+		// Use finally to always lock the box no matter what
+		} finally {
+			box.lock();
+		}
+	}
+
+	try {
+	  withBoxUnlocked(function() {
+	    throw new Error("Pirates on the horizon! Abort!");
+	  });
+	} catch (e) {
+	  console.log("Error raised:", e);
+	}
+
+
+	</script>
+	</body>
+</html>

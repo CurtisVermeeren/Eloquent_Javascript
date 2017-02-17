@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Sequence Interface</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	function ArraySequence(array){
+		this.pos = -1;
+		this.array = array;
+	}
+
+	// Check if there are more elements in the sequence
+	// return true if elements exist
+	ArraySequence.prototype.next = function(){
+		if (this.pos >= this.array.length - 1)
+			return false;
+		// Increment postion to the next element
+		this.pos++;
+		return true;
+	}
+
+	// Return the current elements
+	ArraySequence.prototype.current = function(){
+		return this.array[this.pos];
+	}
+
+	// Console logs the first 5 elements of a sequence if they exist
+	function logFive(sequence){
+		for (var x = 0; x < 5; x++){
+			// If there isn't a next element stop
+			// next() will also iterate to the next element
+			if (!sequence.next()) break;
+			console.log(sequence.current());
+		}
+	}
+
+	//Ranged sequence that has elements with index to and from
+	function RangedSequence(from, to){
+		this.pos = from - 1;
+		this.to = to;
+	}
+
+	//Get the next in the RangedSequence
+	RangedSequence.prototype.next = function(){
+		//If going past the range end there should be no next
+		if (this.pos >= this.to) return false;
+		// Increment postion to the next element
+		this.pos++;
+		return true;
+	}
+
+	//Get the current in the range
+	RangedSequence.prototype.current = function(){
+		return this.pos;
+	}
+
+	logFive(new ArraySequence([1,2,4]));
+	logFive(new RangedSequence(100, 150));
+	</script>
+	</body>
+</html>

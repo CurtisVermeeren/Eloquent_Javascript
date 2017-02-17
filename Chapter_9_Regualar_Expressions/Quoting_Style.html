@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Quoting Style</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	var text = "'I'm the cook, ' he said, 'it's my job.'";
+
+	console.log(text.replace(/(^|\W)'|'(\W|$)/g, '$1"$2'));
+	</script>
+	</body>
+</html>

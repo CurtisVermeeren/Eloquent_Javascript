@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Regualr Expression Golf</title>
+	</head>
+	<body>
+	<script type="text/javascript">
+	// 1. car or cat
+	verify(/ca[tr]/, // cat then a t or r
+       ["my car", "bad cats"],
+       ["camper", "high art"]);
+
+	// 2. pop or prop
+	verify(/pr?op/, // pop with an optional r after the first p
+	       ["pop culture", "mad props"],
+	       ["plop"]);
+
+	// 3. ferret, ferry, ferrari
+	verify(/ferr[eya]/, //ferre ferry ferra
+	       ["ferret", "ferry", "ferrari"],
+	       ["ferrum", "transfer A"]);
+
+	verify(/ious\b/, // ious then end of word
+	       ["how delicious", "spacious room"],
+	       ["ruinous", "consciousness"]);
+
+	verify(/\s[.]/, // Whitespace then a period
+	       ["bad punctuation ."],
+	       ["escape the dot"]);
+
+	verify(/\w{7,}/, // Any sequence of 7 or more word characters
+	       ["hottentottententen"],
+	       ["no", "hotten totten tenten"]);
+
+	verify(/\b[a-df-z]+\b/i, // start of a word then only char from a-d or f-z any number of times then end of word. (Words with no e)
+	       ["red platypus", "wobbling nest"],
+	       ["earth bed", "learning ape"]);
+
+	// Function used to verify
+	// Console logs errors or wrong matches
+	function verify(regexp, yes, no) {
+	  // Ignore unfinished exercises
+	  if (regexp.source == "...") return;
+	  yes.forEach(function(s) {
+	    if (!regexp.test(s))
+	      console.log("Failure to match '" + s + "'");
+	  });
+	  no.forEach(function(s) {
+	    if (regexp.test(s))
+	      console.log("Unexpected match for '" + s + "'");
+	  });
+	}
+	</script>
+	</body>
+</html>

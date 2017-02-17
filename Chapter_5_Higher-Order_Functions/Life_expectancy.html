@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Historical Life Expectancy</title>
+		<script src="code/ancestry.js"></script>
+	</head>
+	<body>
+	<script type="text/javascript">
+	// load dependencies in head and parse JSON
+	var ancestry = JSON.parse(ANCESTRY_FILE);
+
+	function average(array){
+		function plus(a,b){return a + b;}
+		return array.reduce(plus) / array.length;
+	}
+
+	//Function to group an array of people by an attribute
+	function groupBy(array,groupOf){
+		var groups = {};
+		array.forEach(function(element){
+			var groupName = groupOf(element);
+			if (groupName in groups)
+				groups[groupName].push(element);
+			else
+				groups[groupName] = [element];
+		});
+		return groups;
+	}
+
+	//Group people by century using groupBy
+	var byCentury = groupBy(ancestry, function(person){
+		//Determine each person's century
+		return Math.ceil(person.died / 100);
+	});
+
+	//Get the results
+	//Get each century
+	for (var century in byCentury){
+		//Get the life span of everyone in that century
+		var ages = byCentury[century].map(function(person){
+			return person.died - person.born;
+		});
+		console.log(century + ": "+ average(ages));
+	}
+	</script>
+	</body>
+</html>
